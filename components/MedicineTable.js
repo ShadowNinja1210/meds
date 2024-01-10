@@ -1,17 +1,19 @@
+"use client";
+
 import { BsCircleHalf, BsCircleFill } from "react-icons/bs";
 import dayjs from "dayjs";
 import { useState, useEffect } from "react";
+import Loader from "./Loader";
 
-const MedicineRow = ({ medicine, person, setLoading }) => {
+const MedicineRow = ({ medicine, person, setLoading, completed }) => {
   const newPerson = person.toLowerCase();
-  const today = dayjs.utc().format("YYYY-MM-DD");
   const handleTakeMedicine = async (medicine) => {
     try {
       const dataToUpdate = {
         person: newPerson,
+        completed: completed,
         medicineId: medicine._id,
         taken: !medicine.taken,
-        date: dayjs(today).utc(),
       };
       setLoading(true);
       const response = await fetch("/api/medicines/update", {
@@ -63,7 +65,20 @@ const MedicineTable = ({ person }) => {
   //--------------------------------------------------------//
   //--------------------------------------------------------//
   const [meds, setMeds] = useState([]);
+  const [completed, setCompleted] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [personId, setPersonId] = useState("");
+
+  const CompletedUpdate = () => {
+    console.log("Checking completion");
+    meds.map((item) => {
+      if (item.taken === false) {
+        setCompleted(false);
+      } else {
+        setCompleted(true);
+      }
+    });
+  };
 
   async function fetchData(person) {
     try {
@@ -75,6 +90,7 @@ const MedicineTable = ({ person }) => {
         if (dayjs(item.date).format("MM-DD-YYYY") == formattedToday) {
           item.data.map((item) => {
             if (item.person == person.toLowerCase()) {
+              setPersonId(item._id);
               setMeds(item.medicines);
             }
           });
@@ -87,6 +103,7 @@ const MedicineTable = ({ person }) => {
 
   useEffect(() => {
     fetchData(person.toLowerCase());
+    CompletedUpdate();
   }, [loading]);
 
   //--------------------------------------------------------//
@@ -125,6 +142,8 @@ const MedicineTable = ({ person }) => {
                 person={person}
                 loading={loading}
                 setLoading={setLoading}
+                completed={completed}
+                personId={personId}
               />
             </>
           )}
@@ -150,6 +169,8 @@ const MedicineTable = ({ person }) => {
                 person={person}
                 loading={loading}
                 setLoading={setLoading}
+                completed={completed}
+                personId={personId}
               />
             </>
           )}
@@ -169,7 +190,15 @@ const MedicineTable = ({ person }) => {
                   className="mb-2"
                 />
               </picture>
-              <MedicineRow medicine={night} time="Night" person={person} loading={loading} setLoading={setLoading} />
+              <MedicineRow
+                medicine={night}
+                time="Night"
+                person={person}
+                loading={loading}
+                setLoading={setLoading}
+                completed={completed}
+                personId={personId}
+              />
             </>
           )}
         </div>

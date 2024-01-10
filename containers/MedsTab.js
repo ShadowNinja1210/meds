@@ -1,9 +1,40 @@
+"use client";
+
 import CalendarDate from "@/components/CalendarDate";
+import Completed from "@/components/Completed";
 import MedicineTable from "@/components/MedicineTable";
 import Link from "next/link";
+import dayjs from "dayjs";
+import { useEffect, useState } from "react";
 import { IoHomeSharp } from "react-icons/io5";
 
-const MedsTab = ({ person, meds }) => {
+const MedsTab = ({ person }) => {
+  const [completed, setCompleted] = useState(false);
+
+  const fetchData = async () => {
+    try {
+      const today = dayjs.utc();
+      const formattedToday = dayjs(today).format("MM-DD-YYYY");
+      const response = await fetch("/api/medicines");
+      const rawData = await response.json();
+      rawData.map((item) => {
+        if (dayjs(item.date).format("MM-DD-YYYY") == formattedToday) {
+          item.data.map((item) => {
+            if (item.person == person.toLowerCase()) {
+              setCompleted(item.completed);
+            }
+          });
+        }
+      });
+    } catch (err) {
+      console.error("Error fetching data:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   const color = () => {
     switch (person) {
       case "Papa":
@@ -51,12 +82,18 @@ const MedsTab = ({ person, meds }) => {
         </h1>
       </section>
 
+      {completed && (
+        <section>
+          <Completed />
+        </section>
+      )}
+
       <section>
         <CalendarDate />
       </section>
 
       <section>
-        <MedicineTable medicines={meds} person={person} />
+        <MedicineTable person={person} />
       </section>
     </>
   );

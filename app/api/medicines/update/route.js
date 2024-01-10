@@ -4,8 +4,8 @@ import Medicine from "../../../../models/Medicine";
 export const PATCH = async (req) => {
   await connectDB();
   try {
-    const { person, medicineId, taken, date } = await req.json();
-    console.log(person, medicineId, taken, date);
+    const { person, medicineId, taken, completed } = await req.json();
+    console.log(person, medicineId, taken, completed);
 
     /*------------------------------------------------------------------------------*/
     const foundMeds = await Medicine.findOne({ "data.medicines._id": medicineId });
@@ -14,16 +14,14 @@ export const PATCH = async (req) => {
 
     const personToUpdate = foundMeds.data.find((item) => item.person === person);
 
-    console.log(personToUpdate);
-
     if (!personToUpdate) return new Response("Not found", { status: 404 });
     else {
+      personToUpdate.completed = completed;
       const medicineToUpdate = personToUpdate.medicines.find((meds) => meds._id.toString() === medicineId);
 
       if (!medicineId) {
         return new Response("Not found", { status: 404 });
       } else {
-        console.log(medicineToUpdate);
         medicineToUpdate.taken = taken;
         foundMeds.save();
         return new Response(JSON.stringify(foundMeds), { status: 200 });
