@@ -1,6 +1,41 @@
 import { BsCircleHalf, BsCircleFill } from "react-icons/bs";
+import dayjs from "dayjs";
+import { useState, useEffect } from "react";
 
-const MedicineRow = ({ medicine, onTakeMedicine }) => {
+const MedicineRow = ({ medicine, person, setLoading }) => {
+  const newPerson = person.toLowerCase();
+  const today = dayjs.utc().format("YYYY-MM-DD");
+  const handleTakeMedicine = async (medicine) => {
+    try {
+      const dataToUpdate = {
+        person: newPerson,
+        medicineId: medicine._id,
+        taken: !medicine.taken,
+        date: dayjs(today).utc(),
+      };
+      setLoading(true);
+      const response = await fetch("/api/medicines/update", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(dataToUpdate),
+      });
+
+      if (response.ok) {
+        console.log("Medicine updated successfully");
+      } else {
+        console.error("Failed to update medicine");
+      }
+    } catch (error) {
+      console.error("Error updating medicine:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const Tick = () => <span className=" font-black">&#10003;</span>;
+
   return medicine.map((medicine, index) => (
     <span
       key={index}
@@ -13,18 +48,53 @@ const MedicineRow = ({ medicine, onTakeMedicine }) => {
         {medicine.amount == 1 ? <BsCircleFill className="text-white" /> : <BsCircleHalf className="text-white" />}
       </span>
       <span className="py-2 px-4 w-24 flex justify-start items-center">
-        <button onClick={() => onTakeMedicine(medicine)} className="bg-gray-800 text-white px-2 py-1 rounded">
-          Take
+        <button
+          onClick={() => handleTakeMedicine(medicine)}
+          className={`${medicine.taken ? "bg-green-500" : "bg-gray-800"} text-white px-2 py-1 rounded w-14`}
+        >
+          {!medicine.taken ? "Take" : <Tick />}
         </button>
       </span>
     </span>
   ));
 };
 
-const MedicineTable = ({ medicines, onTakeMedicine }) => {
-  const morning = medicines.filter((medicine) => medicine.time === "Morning");
-  const afternoon = medicines.filter((medicine) => medicine.time === "Afternoon");
-  const night = medicines.filter((medicine) => medicine.time === "Night");
+const MedicineTable = ({ person }) => {
+  //--------------------------------------------------------//
+  //--------------------------------------------------------//
+  const [meds, setMeds] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  async function fetchData(person) {
+    try {
+      const today = dayjs.utc();
+      const formattedToday = dayjs(today).format("MM-DD-YYYY");
+      const response = await fetch("/api/medicines");
+      const rawData = await response.json();
+      rawData.map((item) => {
+        if (dayjs(item.date).format("MM-DD-YYYY") == formattedToday) {
+          item.data.map((item) => {
+            if (item.person == person.toLowerCase()) {
+              setMeds(item.medicines);
+            }
+          });
+        }
+      });
+    } catch (err) {
+      console.error("Error fetching data:", err);
+    }
+  }
+
+  useEffect(() => {
+    fetchData(person.toLowerCase());
+  }, [loading]);
+
+  //--------------------------------------------------------//
+  //--------------------------------------------------------//
+
+  const morning = meds.filter((medicine) => medicine.time === "Morning");
+  const afternoon = meds.filter((medicine) => medicine.time === "Afternoon");
+  const night = meds.filter((medicine) => medicine.time === "Night");
 
   return (
     <main className="flex flex-col gap-3 p-4 min-w-full bg-gray-900 rounded-lg">
@@ -40,7 +110,7 @@ const MedicineTable = ({ medicines, onTakeMedicine }) => {
           {morning.length > 0 && (
             <>
               <picture>
-                <source srcset="https://fonts.gstatic.com/s/e/notoemoji/latest/1f305/512.webp" type="image/webp" />
+                <source srcSet="https://fonts.gstatic.com/s/e/notoemoji/latest/1f305/512.webp" type="image/webp" />
                 <img
                   src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f305/512.gif"
                   alt="🌅"
@@ -49,7 +119,13 @@ const MedicineTable = ({ medicines, onTakeMedicine }) => {
                   className="mb-2"
                 />
               </picture>
-              <MedicineRow medicine={morning} time="Morning" onTakeMedicine={onTakeMedicine} />
+              <MedicineRow
+                medicine={morning}
+                time="Morning"
+                person={person}
+                loading={loading}
+                setLoading={setLoading}
+              />
             </>
           )}
         </div>
@@ -59,7 +135,7 @@ const MedicineTable = ({ medicines, onTakeMedicine }) => {
           {afternoon.length > 0 && (
             <>
               <picture>
-                <source srcset="https://fonts.gstatic.com/s/e/notoemoji/latest/1f60e/512.webp" type="image/webp" />
+                <source srcSet="https://fonts.gstatic.com/s/e/notoemoji/latest/1f60e/512.webp" type="image/webp" />
                 <img
                   src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f60e/512.gif"
                   alt="😎"
@@ -68,7 +144,13 @@ const MedicineTable = ({ medicines, onTakeMedicine }) => {
                   className="mb-2"
                 />
               </picture>
-              <MedicineRow medicine={afternoon} time="Afternoon" onTakeMedicine={onTakeMedicine} />
+              <MedicineRow
+                medicine={afternoon}
+                time="Afternoon"
+                person={person}
+                loading={loading}
+                setLoading={setLoading}
+              />
             </>
           )}
         </div>
@@ -78,7 +160,7 @@ const MedicineTable = ({ medicines, onTakeMedicine }) => {
           {night.length > 0 && (
             <>
               <picture>
-                <source srcset="https://fonts.gstatic.com/s/e/notoemoji/latest/1f31c/512.webp" type="image/webp" />
+                <source srcSet="https://fonts.gstatic.com/s/e/notoemoji/latest/1f31c/512.webp" type="image/webp" />
                 <img
                   src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f31c/512.gif"
                   alt="🌜"
@@ -87,7 +169,7 @@ const MedicineTable = ({ medicines, onTakeMedicine }) => {
                   className="mb-2"
                 />
               </picture>
-              <MedicineRow medicine={night} time="Night" onTakeMedicine={onTakeMedicine} />
+              <MedicineRow medicine={night} time="Night" person={person} loading={loading} setLoading={setLoading} />
             </>
           )}
         </div>

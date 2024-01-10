@@ -14,15 +14,15 @@ export default function Home() {
           <img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f9d0/512.gif" alt="🧐" width="70" height="70" />
         </picture>
       </section>
-      <section className="flex flex-col items-center gap-20">
+      <section className="flex flex-col items-center gap-20 font-bold">
         <Link href="/papa">
-          <button className="px-4 py-2 text-lg font-medium rounded-lg bg-yellow-500">Papa</button>
+          <button className="px-4 py-2 text-lg rounded-lg border-4 text-yellow-400 border-yellow-500">Papa</button>
         </Link>
         <Link href="/mamma">
-          <button className="px-4 py-2 text-lg font-medium rounded-lg bg-cyan-500">Mamma</button>
+          <button className="px-4 py-2 text-lg rounded-lg border-4 text-cyan-400 border-cyan-500">Mamma</button>
         </Link>
         <Link href="/mummy">
-          <button className="px-4 py-2 text-lg font-medium rounded-lg bg-red-500">Mummy</button>
+          <button className="px-4 py-2 text-lg rounded-lg border-4 text-red-400 border-red-500">Mummy</button>
         </Link>
       </section>
     </main>

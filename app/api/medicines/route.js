@@ -1,16 +1,12 @@
 // pages/api/medicines.js
 import connectDB from "../../../utils/db";
 import Medicine from "../../../models/Medicine";
-import dayjs from "dayjs";
 
 export const GET = async (req, res) => {
   await connectDB();
   try {
     // Getting data from DB
     const medicines = await Medicine.find();
-    let dataDate;
-    medicines.map((item) => (dataDate = item.date));
-    console.log("The date is ", dayjs(dataDate));
     return new Response(JSON.stringify(medicines), { status: 200 });
   } catch (error) {
     return new Response("GET Failed", { status: 500 });
@@ -50,3 +46,33 @@ export const POST = async (req, res) => {
     return new Response("POST Failed", { status: 500 });
   }
 };
+
+// export const PATCH = async (req, res) => {
+//   await connectDB();
+//   try {
+//     const comingData = request.nextUrl.searchParams;
+//     console.log(comingData);
+//     // console.log(req);
+//     // const { person, medicineId, taken, date } = req.body;
+//     // const date = req.query.date;
+//     // const person = req.query.person;
+//     // const medicineId = req.query.medicineId;
+//     // const taken = req.query.taken;
+//     // console.log(person, medicineId, taken, date);
+
+//     const filter = { date: date, "data.person": person, "data.medicines._id": medicineId };
+//     const update = { $set: { "data.$.medicines.$.taken": taken } };
+
+//     const result = await Medicine.updateOne(filter, update);
+
+//     if (result.nModified === 1) {
+//       console.log(`Medicine with ID ${medicineId} updated successfully.`);
+//       return new Response("Medicine updated successfully", { status: 200 });
+//     } else {
+//       console.log(`Failed to update medicine with ID ${medicineId}.`);
+//       return new Response("Failed to update medicine", { status: 500 });
+//     }
+//   } catch (error) {
+//     return new Response("PATCH Failed", { status: 500 });
+//   }
+// };

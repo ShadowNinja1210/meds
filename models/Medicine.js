@@ -10,6 +10,7 @@ const medicineSchema = new mongoose.Schema({
 
 const personSchema = new mongoose.Schema({
   person: String, // Papa
+  completed: Boolean, // false
   medicines: [medicineSchema],
 });
 

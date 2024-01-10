@@ -21,6 +21,7 @@ export const GET = async (req, res) => {
       data: [
         {
           person: "papa",
+          completed: false,
           medicines: [
             { name: "Sorba-30 SR", amount: 1, time: "Morning", taken: false, postMeal: false },
             { name: "Telesky MCT 50/12.5", amount: 1, time: "Morning", taken: false, postMeal: true },
@@ -32,6 +33,7 @@ export const GET = async (req, res) => {
         },
         {
           person: "mummy",
+          completed: false,
           medicines: [
             { name: "Esitamat", amount: 0.5, time: "Afternoon", taken: false, postMeal: true },
             { name: "Feferex-XT", amount: 1, time: "Afternoon", taken: false, postMeal: true },
@@ -42,14 +44,13 @@ export const GET = async (req, res) => {
         },
         {
           person: "mamma",
+          completed: false,
           medicines: [
             { name: "Pentorane", amount: 1, time: "Morning", taken: false, postMeal: false },
             { name: "Metopole 25XL", amount: 1, time: "Morning", taken: false, postMeal: true },
             { name: "Dericip Retard", amount: 1, time: "Morning", taken: false, postMeal: true },
             { name: "Glidax", amount: 1, time: "Afternoon", taken: false, postMeal: false },
             { name: "Feferex-XT", amount: 1, time: "Afternoon", taken: false, postMeal: true },
-            { name: "Zefix O LB", amount: 1, time: "Afternoon", taken: false, postMeal: true },
-            { name: "Zefix O LB", amount: 1, time: "Night", taken: false, postMeal: true },
           ],
         },
       ],
