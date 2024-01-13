@@ -4,14 +4,30 @@ import { BsCircleHalf, BsCircleFill } from "react-icons/bs";
 import dayjs from "dayjs";
 import { useState, useEffect } from "react";
 import Loader from "./Loader";
+import { data } from "autoprefixer";
 
-const MedicineRow = ({ medicine, person, setLoading, completed }) => {
+const MedicineRow = ({ medicines, person, setLoading, meds, setCompleted }) => {
   const newPerson = person.toLowerCase();
+
+  const areAllMedsTaken = (updatedMedicines) => {
+    return updatedMedicines.every((medicine) => medicine.taken);
+  };
+
   const handleTakeMedicine = async (medicine) => {
     try {
+      const updatedMeds = [];
+
+      for (let i = 0; i < meds.length; i++) {
+        if (meds[i]._id === medicine._id) {
+          updatedMeds.push({ ...meds[i], taken: !meds[i].taken });
+        } else {
+          updatedMeds.push(meds[i]);
+        }
+      }
+
       const dataToUpdate = {
         person: newPerson,
-        completed: completed,
+        completed: areAllMedsTaken(updatedMeds),
         medicineId: medicine._id,
         taken: !medicine.taken,
       };
@@ -26,6 +42,7 @@ const MedicineRow = ({ medicine, person, setLoading, completed }) => {
 
       if (response.ok) {
         console.log("Medicine updated successfully");
+        setCompleted(dataToUpdate.completed);
       } else {
         console.error("Failed to update medicine");
       }
@@ -38,7 +55,7 @@ const MedicineRow = ({ medicine, person, setLoading, completed }) => {
 
   const Tick = () => <span className=" font-black">&#10003;</span>;
 
-  return medicine.map((medicine, index) => (
+  return medicines.map((medicine, index) => (
     <span
       key={index}
       className={`flex gap-4 ${medicine.taken ? "opacity-70" : "opacity-100"} ${
@@ -61,24 +78,11 @@ const MedicineRow = ({ medicine, person, setLoading, completed }) => {
   ));
 };
 
-const MedicineTable = ({ person }) => {
+const MedicineTable = ({ person, setCompleted }) => {
   //--------------------------------------------------------//
   //--------------------------------------------------------//
   const [meds, setMeds] = useState([]);
-  const [completed, setCompleted] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [personId, setPersonId] = useState("");
-
-  const CompletedUpdate = () => {
-    console.log("Checking completion");
-    meds.map((item) => {
-      if (item.taken === false) {
-        setCompleted(false);
-      } else {
-        setCompleted(true);
-      }
-    });
-  };
 
   async function fetchData(person) {
     try {
@@ -90,7 +94,6 @@ const MedicineTable = ({ person }) => {
         if (dayjs(item.date).format("MM-DD-YYYY") == formattedToday) {
           item.data.map((item) => {
             if (item.person == person.toLowerCase()) {
-              setPersonId(item._id);
               setMeds(item.medicines);
             }
           });
@@ -103,7 +106,6 @@ const MedicineTable = ({ person }) => {
 
   useEffect(() => {
     fetchData(person.toLowerCase());
-    CompletedUpdate();
   }, [loading]);
 
   //--------------------------------------------------------//
@@ -137,13 +139,12 @@ const MedicineTable = ({ person }) => {
                 />
               </picture>
               <MedicineRow
-                medicine={morning}
+                medicines={morning}
+                meds={meds}
                 time="Morning"
                 person={person}
-                loading={loading}
                 setLoading={setLoading}
-                completed={completed}
-                personId={personId}
+                setCompleted={setCompleted}
               />
             </>
           )}
@@ -164,13 +165,12 @@ const MedicineTable = ({ person }) => {
                 />
               </picture>
               <MedicineRow
-                medicine={afternoon}
+                medicines={afternoon}
+                meds={meds}
                 time="Afternoon"
                 person={person}
-                loading={loading}
                 setLoading={setLoading}
-                completed={completed}
-                personId={personId}
+                setCompleted={setCompleted}
               />
             </>
           )}
@@ -191,13 +191,12 @@ const MedicineTable = ({ person }) => {
                 />
               </picture>
               <MedicineRow
-                medicine={night}
+                medicines={night}
+                meds={meds}
                 time="Night"
                 person={person}
-                loading={loading}
                 setLoading={setLoading}
-                completed={completed}
-                personId={personId}
+                setCompleted={setCompleted}
               />
             </>
           )}

@@ -93,7 +93,7 @@ const MedsTab = ({ person }) => {
       </section>
 
       <section>
-        <MedicineTable person={person} />
+        <MedicineTable person={person} completed={completed} setCompleted={setCompleted} />
       </section>
     </>
   );

@@ -2,10 +2,9 @@
 import connectDB from "../../../utils/db";
 import Medicine from "../../../models/Medicine";
 
-export const GET = async (req, res) => {
+export const GET = async () => {
   await connectDB();
   try {
-    // Getting data from DB
     const medicines = await Medicine.find();
     return new Response(JSON.stringify(medicines), { status: 200 });
   } catch (error) {
