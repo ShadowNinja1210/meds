@@ -11,10 +11,75 @@ import { IoHomeSharp } from "react-icons/io5";
 const MedsTab = ({ person }) => {
   const [completed, setCompleted] = useState(false);
 
+  const today = dayjs.utc();
+  const yesterday = today.subtract(1, "day");
+  const formattedToday = dayjs(today).format("MM-DD-YYYY");
+  const formattedYesterday = dayjs(yesterday).format("MM-DD-YYYY");
+
+  const updateStreak = async () => {
+    try {
+      let dataToUpdate;
+
+      // GETTING Streak Data from the servers
+      const data = await fetch("/api/streak");
+      const rawData = await data.json();
+
+      rawData.map((item) => {
+        // Checking if the today's medicines are completed
+        if (completed) {
+          // Checking for the person
+          if (item.person == person.toLowerCase()) {
+            console.log("item");
+            console.log(item);
+            console.log("item.currentStreak.endDate");
+            console.log(dayjs(item.currentStreak.endDate));
+            console.log(dayjs(item.currentStreak.endDate) === dayjs(formattedYesterday));
+            console.log("formattedYesterday");
+            console.log(dayjs(formattedYesterday));
+            // Checking if the person has a streak
+            if (dayjs(item.currentStreak.endDate) === dayjs(formattedYesterday)) {
+              // Updating the Streak Data
+              dataToUpdate = {
+                person: person.toLowerCase(),
+                startDate: item.currentStreak.startDate,
+                endDate: formattedToday,
+              };
+            } else {
+              // Updating the Streak Data with new streak
+              dataToUpdate = {
+                person: person.toLowerCase(),
+                startDate: formattedToday,
+                endDate: formattedToday,
+              };
+            }
+          }
+        }
+      });
+
+      console.log("dataToUpdate");
+      console.log(dataToUpdate);
+
+      // PATCHING Streak Data to the servers
+      const response = await fetch("/api/streak/update", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(dataToUpdate),
+      });
+
+      if (response.ok) {
+        console.log("Streak updated successfully");
+      } else {
+        console.error("Failed to update streak");
+      }
+    } catch (err) {
+      console.error("Error updating data:", err);
+    }
+  };
+
   const fetchData = async () => {
     try {
-      const today = dayjs.utc();
-      const formattedToday = dayjs(today).format("MM-DD-YYYY");
       const response = await fetch("/api/medicines");
       const rawData = await response.json();
       rawData.map((item) => {
@@ -32,7 +97,12 @@ const MedsTab = ({ person }) => {
   };
 
   useEffect(() => {
+    if (completed) updateStreak();
+  }, [completed]);
+
+  useEffect(() => {
     fetchData();
+    // fetchStreak();
   }, []);
 
   const color = () => {

@@ -1,11 +1,10 @@
-import connectDB from "../../../../utils/db";
-import Medicine from "../../../../models/Medicine";
+import connectDB from "@/utils/db";
+import Medicine from "@/models/Medicine";
 
 export const PATCH = async (req) => {
   await connectDB();
   try {
     const { person, medicineId, taken, completed } = await req.json();
-    console.log(person, medicineId, taken, completed);
 
     /*------------------------------------------------------------------------------*/
     const foundMeds = await Medicine.findOne({ "data.medicines._id": medicineId });

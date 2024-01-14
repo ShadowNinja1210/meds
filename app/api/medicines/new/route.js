@@ -1,6 +1,5 @@
-// pages/api/medicines.js
-import connectDB from "../../../../utils/db";
-import Medicine from "../../../../models/Medicine";
+import connectDB from "@/utils/db";
+import Medicine from "@/models/Medicine";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 
@@ -9,12 +8,9 @@ dayjs.extend(utc);
 export const GET = async (req, res) => {
   await connectDB();
   try {
-    const today = dayjs.utc(); // Today's Date
-    console.log(today);
+    const today = dayjs.utc();
     const formattedToday = dayjs(today).format("MM-DD-YYYY").toString();
-    console.log(formattedToday, typeof formattedToday);
     const medicines = await Medicine.findOne({ date: formattedToday }); // Getting data from DB
-    console.log(medicines);
 
     const newData = {
       date: formattedToday,
@@ -57,7 +53,6 @@ export const GET = async (req, res) => {
     };
 
     if (!medicines) {
-      console.log(newData);
       await Medicine.create(newData);
       return new Response("New Medicine added Successfully", { status: 200 });
     } else {

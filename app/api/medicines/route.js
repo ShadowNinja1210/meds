@@ -1,6 +1,6 @@
 // pages/api/medicines.js
-import connectDB from "../../../utils/db";
-import Medicine from "../../../models/Medicine";
+import connectDB from "@/utils/db";
+import Medicine from "@/models/Medicine";
 
 export const GET = async () => {
   await connectDB();
