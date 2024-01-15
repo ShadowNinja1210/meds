@@ -56,7 +56,7 @@ export const GET = async (req, res) => {
       await Medicine.create(newData);
       return new Response("New Medicine added Successfully", { status: 200 });
     } else {
-      return new Response("Already Exists", { status: 500 });
+      return new Response("Already Exists", { status: 418 });
     }
   } catch (error) {
     return new Response("POST Failed", { status: 500 });

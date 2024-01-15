@@ -10,6 +10,7 @@ import { IoHomeSharp } from "react-icons/io5";
 
 const MedsTab = ({ person }) => {
   const [completed, setCompleted] = useState(false);
+  const [streak, setStreak] = useState(0);
 
   const today = dayjs.utc();
   const yesterday = today.subtract(1, "day");
@@ -29,32 +30,38 @@ const MedsTab = ({ person }) => {
         if (completed) {
           // Checking for the person
           if (item.person == person.toLowerCase()) {
-            console.log("item");
-            console.log(item);
-            console.log("item.currentStreak.endDate");
-            console.log(dayjs(item.currentStreak.endDate));
-            console.log(dayjs(item.currentStreak.endDate) === dayjs(formattedYesterday));
-            console.log("formattedYesterday");
-            console.log(dayjs(formattedYesterday));
+            const endDate = dayjs(item.currentStreak.endDate);
+
             // Checking if the person has a streak
-            if (dayjs(item.currentStreak.endDate) === dayjs(formattedYesterday)) {
+            if (endDate.isSame(dayjs(formattedYesterday))) {
+              // If end date is same as yesterday's date for checking the person has streak or not
               // Updating the Streak Data
               dataToUpdate = {
                 person: person.toLowerCase(),
                 startDate: item.currentStreak.startDate,
                 endDate: formattedToday,
               };
-            } else {
+            } else if (!endDate.isSame(dayjs(formattedToday))) {
+              //If end date is not same as today's date, then the streak is broken and we need to update Start Date and End Date to today's date
               // Updating the Streak Data with new streak
               dataToUpdate = {
                 person: person.toLowerCase(),
                 startDate: formattedToday,
                 endDate: formattedToday,
               };
+            } else {
+              // If end date is same as today's date, then the streak is already updated
+              console.log("Streak already updated");
+              return Promise.resolve();
             }
           }
         }
       });
+
+      if (!dataToUpdate) {
+        console.log("No data to update");
+        return Promise.resolve();
+      }
 
       console.log("dataToUpdate");
       console.log(dataToUpdate);
@@ -96,8 +103,23 @@ const MedsTab = ({ person }) => {
     }
   };
 
+  const fetchStreak = async () => {
+    const data = await fetch("/api/streak");
+    const rawData = await data.json();
+
+    rawData.map((item) => {
+      if (item.person == person.toLowerCase()) {
+        // Checking the streak by comparing the end date and start date
+        const streakNum = dayjs(item.currentStreak.endDate).diff(dayjs(item.currentStreak.startDate), "day");
+        // Setting the streak to the state
+        setStreak(streakNum + 1); // We're adding 1 because the streak will be displayed only when today's medicines are completed so it would be like today's streak is not 0 but 1
+      }
+    });
+  };
+
   useEffect(() => {
-    if (completed) updateStreak();
+    if (completed) updateStreak().then(() => fetchStreak());
+    fetchStreak();
   }, [completed]);
 
   useEffect(() => {
@@ -155,6 +177,7 @@ const MedsTab = ({ person }) => {
       {completed && (
         <section>
           <Completed />
+          {streak > 0 && <h1>{streak}</h1>}
         </section>
       )}
 
