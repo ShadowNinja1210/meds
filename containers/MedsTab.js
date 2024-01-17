@@ -40,14 +40,35 @@ const MedsTab = ({ person }) => {
                 person: person.toLowerCase(),
                 startDate: item.currentStreak.startDate,
                 endDate: formattedToday,
+                streakHistory: item.streakHistory,
               };
             } else if (!endDate.isSame(dayjs(formattedToday))) {
+              // -------
+              const startDate = dayjs(item.currentStreak.startDate);
+              let canPush;
+
+              if (!item.streakHistory.length || !item.streakHistory) {
+                // If history is empty
+                item.streakHistory = [];
+                item.streakHistory.push({ startDate: startDate, endDate: endDate });
+              } else {
+                // If history is not empty
+                canPush = item.streakHistory.every((item) => item.startDate !== startDate || item.endDate !== endDate);
+                if (canPush) {
+                  item.streakHistory.push({ startDate: startDate, endDate: endDate });
+                } else {
+                  console.log("Streak history already updated");
+                }
+              }
+
+              // -------
               //If end date is not same as today's date, then the streak is broken and we need to update Start Date and End Date to today's date
               // Updating the Streak Data with new streak
               dataToUpdate = {
                 person: person.toLowerCase(),
                 startDate: formattedToday,
                 endDate: formattedToday,
+                streakHistory: item.streakHistory,
               };
             } else {
               // If end date is same as today's date, then the streak is already updated
@@ -62,9 +83,6 @@ const MedsTab = ({ person }) => {
         console.log("No data to update");
         return Promise.resolve();
       }
-
-      console.log("dataToUpdate");
-      console.log(dataToUpdate);
 
       // PATCHING Streak Data to the servers
       const response = await fetch("/api/streak/update", {
@@ -175,9 +193,30 @@ const MedsTab = ({ person }) => {
       </section>
 
       {completed && (
-        <section>
+        <section className="flex flex-col justify-center items-center">
           <Completed />
-          {streak > 0 && <h1>{streak}</h1>}
+          {streak > 0 && (
+            <div className="px-2 py-1">
+              <span style={{ color: color() }} className="text-3xl">
+                &#9734;
+              </span>
+
+              <span
+                style={{
+                  fontSize: "1.5rem",
+                  fontWeight: "500",
+                  lineHeight: "1.5rem",
+                  paddingLeft: "4px",
+                  paddingRight: "8px",
+                  color: color(),
+                }}
+              >
+                Streak:
+              </span>
+
+              <span style={{ lineHeight: "1.9rem", fontSize: "1.4rem", fontWeight: "500" }}>{streak}</span>
+            </div>
+          )}
         </section>
       )}
 

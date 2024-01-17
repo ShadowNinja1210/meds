@@ -4,8 +4,8 @@ import Streak from "@/models/Streak";
 export const PATCH = async (req) => {
   await connectDB();
   try {
-    const { person, endDate, startDate } = await req.json();
-    console.log(person, endDate, startDate);
+    const { person, endDate, startDate, streakHistory } = await req.json();
+    console.log(person, endDate, startDate, streakHistory);
 
     const streaks = await Streak.find();
     if (!streaks) {
@@ -15,6 +15,7 @@ export const PATCH = async (req) => {
         if (item.person === person) {
           item.currentStreak.startDate = startDate;
           item.currentStreak.endDate = endDate;
+          item.streakHistory = streakHistory;
         }
         await item.save();
       });
