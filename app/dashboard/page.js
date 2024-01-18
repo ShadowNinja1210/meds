@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { GiMedicines } from "react-icons/gi";
 
 const Dashboard = () => {
   return (
@@ -25,6 +26,9 @@ const Dashboard = () => {
           <button className="px-4 py-2 text-lg rounded-lg border-4 text-red-400 border-red-500">Mummy</button>
         </Link>
       </section>
+      <Link href="/" className="text-8xl">
+        <GiMedicines className=" text-gray-200 p-1" />
+      </Link>
     </main>
   );
 };

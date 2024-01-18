@@ -3,7 +3,6 @@
 import { BsCircleHalf, BsCircleFill } from "react-icons/bs";
 import dayjs from "dayjs";
 import { useState, useEffect } from "react";
-import Loader from "./Loader";
 
 const MedicineRow = ({ medicines, person, setLoading, meds, setCompleted }) => {
   const newPerson = person.toLowerCase();

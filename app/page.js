@@ -1,10 +1,11 @@
 import Link from "next/link";
+import { FaChartBar } from "react-icons/fa";
 
 export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center gap-24 py-20">
       <section className="flex flex-col gap-10 items-center">
-        <h1 className=" text-4xl font-bold">
+        <h1 className=" text-4xl font-bold ">
           <span className=" text-yellow-500">Med</span>
           <span className=" text-cyan-500">ici</span>
           <span className=" text-red-500">nes</span>
@@ -25,6 +26,9 @@ export default function Home() {
           <button className="px-4 py-2 text-lg rounded-lg border-4 text-red-400 border-red-500">Mummy</button>
         </Link>
       </section>
+      <Link href="/dashboard" className="text-6xl">
+        <FaChartBar className=" text-gray-200 p-1" />
+      </Link>
     </main>
   );
 }

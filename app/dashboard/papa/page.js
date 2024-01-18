@@ -2,9 +2,9 @@ import DashboardTab from "@/containers/DashboardTab";
 
 const papa = () => {
   return (
-    <div>
+    <main className="flex min-h-screen flex-col items-center py-8 gap-6">
       <DashboardTab person="papa" />
-    </div>
+    </main>
   );
 };
 

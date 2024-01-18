@@ -130,7 +130,7 @@ const MedsTab = ({ person }) => {
         // Checking the streak by comparing the end date and start date
         const streakNum = dayjs(item.currentStreak.endDate).diff(dayjs(item.currentStreak.startDate), "day");
         // Setting the streak to the state
-        setStreak(streakNum + 1); // We're adding 1 because the streak will be displayed only when today's medicines are completed so it would be like today's streak is not 0 but 1
+        setStreak(streakNum); // Setting the streak to the state
       }
     });
   };
