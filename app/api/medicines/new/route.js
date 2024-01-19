@@ -5,7 +5,7 @@ import utc from "dayjs/plugin/utc";
 
 dayjs.extend(utc);
 
-export const GET = async (req, res) => {
+export const POST = async () => {
   await connectDB();
   try {
     const today = dayjs.utc();
