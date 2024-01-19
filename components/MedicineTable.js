@@ -2,10 +2,12 @@
 
 import { BsCircleHalf, BsCircleFill } from "react-icons/bs";
 import dayjs from "dayjs";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { useLoading } from "@/utils/LoadingContext";
 
-const MedicineRow = ({ medicines, person, setLoading, meds, setCompleted }) => {
+const MedicineRow = ({ medicines, person, meds, setCompleted }) => {
   const newPerson = person.toLowerCase();
+  const { isLoading, startLoading, stopLoading } = useLoading();
 
   const areAllMedsTaken = (updatedMedicines) => {
     return updatedMedicines.every((medicine) => medicine.taken);
@@ -13,6 +15,9 @@ const MedicineRow = ({ medicines, person, setLoading, meds, setCompleted }) => {
 
   const handleTakeMedicine = async (medicine) => {
     try {
+      if (!isLoading) {
+        startLoading();
+      }
       const updatedMeds = [];
 
       for (let i = 0; i < meds.length; i++) {
@@ -29,7 +34,6 @@ const MedicineRow = ({ medicines, person, setLoading, meds, setCompleted }) => {
         medicineId: medicine._id,
         taken: !medicine.taken,
       };
-      setLoading(true);
       const response = await fetch("/api/medicines/update", {
         method: "PATCH",
         headers: {
@@ -47,7 +51,7 @@ const MedicineRow = ({ medicines, person, setLoading, meds, setCompleted }) => {
     } catch (error) {
       console.error("Error updating medicine:", error);
     } finally {
-      setLoading(false);
+      stopLoading();
     }
   };
 
@@ -79,11 +83,14 @@ const MedicineRow = ({ medicines, person, setLoading, meds, setCompleted }) => {
 const MedicineTable = ({ person, setCompleted }) => {
   //--------------------------------------------------------//
   //--------------------------------------------------------//
+  const { isLoading, startLoading, stopLoading } = useLoading();
   const [meds, setMeds] = useState([]);
-  const [loading, setLoading] = useState(false);
 
   async function fetchData(person) {
     try {
+      if (!isLoading) {
+        startLoading();
+      }
       const today = dayjs.utc();
       const formattedToday = dayjs(today).format("MM-DD-YYYY");
       const response = await fetch("/api/medicines");
@@ -104,7 +111,8 @@ const MedicineTable = ({ person, setCompleted }) => {
 
   useEffect(() => {
     fetchData(person.toLowerCase());
-  }, [loading]);
+    stopLoading();
+  }, [isLoading]);
 
   //--------------------------------------------------------//
   //--------------------------------------------------------//
@@ -136,14 +144,7 @@ const MedicineTable = ({ person, setCompleted }) => {
                   className="mb-2"
                 />
               </picture>
-              <MedicineRow
-                medicines={morning}
-                meds={meds}
-                time="Morning"
-                person={person}
-                setLoading={setLoading}
-                setCompleted={setCompleted}
-              />
+              <MedicineRow medicines={morning} meds={meds} time="Morning" person={person} setCompleted={setCompleted} />
             </>
           )}
         </div>
@@ -167,7 +168,6 @@ const MedicineTable = ({ person, setCompleted }) => {
                 meds={meds}
                 time="Afternoon"
                 person={person}
-                setLoading={setLoading}
                 setCompleted={setCompleted}
               />
             </>
@@ -188,14 +188,7 @@ const MedicineTable = ({ person, setCompleted }) => {
                   className="mb-2"
                 />
               </picture>
-              <MedicineRow
-                medicines={night}
-                meds={meds}
-                time="Night"
-                person={person}
-                setLoading={setLoading}
-                setCompleted={setCompleted}
-              />
+              <MedicineRow medicines={night} meds={meds} time="Night" person={person} setCompleted={setCompleted} />
             </>
           )}
         </div>

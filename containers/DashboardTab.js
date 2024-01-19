@@ -6,11 +6,14 @@ import Link from "next/link";
 import dayjs from "dayjs";
 import Calendar from "@/components/Calendar";
 import Money from "@/components/Money";
+import { useLoading } from "@/utils/LoadingContext";
+import Loader from "@/components/Loader";
 
 const orbitron = Orbitron({ subsets: ["latin"] });
 
 const DashboardTab = ({ person }) => {
   const [data, setData] = useState({ person: "", data: [], highest: 0, streak: 0 });
+  const { startLoading, stopLoading, isLoading } = useLoading();
 
   const completedData = async () => {
     const res = await fetch("/api/medicines");
@@ -53,8 +56,8 @@ const DashboardTab = ({ person }) => {
     return result;
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
+  const fetchData = async () => {
+    try {
       const completedDataResult = await completedData();
       const streakHis = await fetchStreakHis();
       const streak = await fetchStreak();
@@ -84,9 +87,24 @@ const DashboardTab = ({ person }) => {
         highest: checkHighest(),
         streak: endDate.diff(startDate, "day"),
       });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchDataAndLoading = async () => {
+      try {
+        startLoading();
+        await fetchData();
+      } catch (error) {
+        console.log(error);
+      } finally {
+        stopLoading();
+      }
     };
 
-    fetchData();
+    fetchDataAndLoading();
   }, []);
 
   const color = () => {
@@ -104,54 +122,60 @@ const DashboardTab = ({ person }) => {
 
   return (
     <>
-      <section
-        style={{
-          fontSize: "2rem",
-          lineHeight: "2rem",
-          fontWeight: "bold",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          width: "20rem",
-          marginBottom: "0.5rem",
-          color: color(),
-        }}
-      >
-        <Link href="/dashboard">
-          <button>
-            <IoHomeSharp />
-          </button>
-        </Link>
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <>
+          <section
+            style={{
+              fontSize: "2rem",
+              lineHeight: "2rem",
+              fontWeight: "bold",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              width: "20rem",
+              marginBottom: "0.5rem",
+              color: color(),
+            }}
+          >
+            <Link href="/dashboard">
+              <button>
+                <IoHomeSharp />
+              </button>
+            </Link>
 
-        <h1
-          style={{
-            padding: "2px 6px",
-            fontSize: "1.35rem",
-            borderRadius: "6px",
-            border: `solid 4px ${color()}`,
-            color: color(),
-            textTransform: "capitalize",
-          }}
-        >
-          {person}
-        </h1>
-      </section>
+            <h1
+              style={{
+                padding: "2px 6px",
+                fontSize: "1.35rem",
+                borderRadius: "6px",
+                border: `solid 4px ${color()}`,
+                color: color(),
+                textTransform: "capitalize",
+              }}
+            >
+              {person}
+            </h1>
+          </section>
 
-      <Money data={data} />
+          <Money data={data} />
 
-      <section className=" rounded-md border-2  bg-gray-900 border-gray-600 py-2 px-4 uppercase flex gap-5 text-xl tracking-wider date-calendar font-semibold">
-        <div className="flex flex-col items-center gap-2">
-          <p className="text-sm flex flex-col items-center text-gray-300">Current Streak</p>
-          <p className={`${orbitron.className} text-4xl`}>{data.streak}</p>
-        </div>
-        <hr className=" my-1 border-t-0 border-r-2 h-auto border-gray-600 " />
-        <div className="flex flex-col items-center gap-2">
-          <p className="text-sm flex flex-col items-center text-gray-300">Highest Streak</p>
-          <p className={`${orbitron.className} text-4xl`}>{data.highest}</p>
-        </div>
-      </section>
+          <section className=" rounded-md border-2  bg-gray-900 border-gray-600 py-2 px-4 uppercase flex gap-5 text-xl tracking-wider date-calendar font-semibold">
+            <div className="flex flex-col items-center gap-2">
+              <p className="text-sm flex flex-col items-center text-gray-300">Current Streak</p>
+              <p className={`${orbitron.className} text-4xl`}>{data.streak}</p>
+            </div>
+            <hr className=" my-1 border-t-0 border-r-2 h-auto border-gray-600 " />
+            <div className="flex flex-col items-center gap-2">
+              <p className="text-sm flex flex-col items-center text-gray-300">Highest Streak</p>
+              <p className={`${orbitron.className} text-4xl`}>{data.highest}</p>
+            </div>
+          </section>
 
-      <Calendar data={data} />
+          <Calendar data={data} />
+        </>
+      )}
     </>
   );
 };

@@ -5,12 +5,15 @@ import Completed from "@/components/Completed";
 import MedicineTable from "@/components/MedicineTable";
 import Link from "next/link";
 import dayjs from "dayjs";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { IoHomeSharp } from "react-icons/io5";
+import { useLoading } from "@/utils/LoadingContext";
+import Loader from "@/components/Loader";
 
 const MedsTab = ({ person }) => {
   const [completed, setCompleted] = useState(false);
   const [streak, setStreak] = useState(0);
+  const { isLoading, startLoading, stopLoading } = useLoading();
 
   const today = dayjs.utc();
   const yesterday = today.subtract(1, "day");
@@ -24,6 +27,9 @@ const MedsTab = ({ person }) => {
       // GETTING Streak Data from the servers
       const data = await fetch("/api/streak");
       const rawData = await data.json();
+      if (!isLoading) {
+        startLoading();
+      }
 
       rawData.map((item) => {
         // Checking if the today's medicines are completed
@@ -105,6 +111,9 @@ const MedsTab = ({ person }) => {
 
   const fetchData = async () => {
     try {
+      if (!isLoading) {
+        startLoading();
+      }
       const response = await fetch("/api/medicines");
       const rawData = await response.json();
       rawData.map((item) => {
@@ -118,27 +127,36 @@ const MedsTab = ({ person }) => {
       });
     } catch (err) {
       console.error("Error fetching data:", err);
+    } finally {
+      stopLoading();
     }
   };
 
   const fetchStreak = async () => {
-    const data = await fetch("/api/streak");
-    const rawData = await data.json();
-    console.log(rawData); // Logging the data (for debugging)
-
-    rawData.map((item) => {
-      if (item.person == person.toLowerCase()) {
-        // Checking the streak by comparing the end date and start date
-        const streakNum = dayjs(item.currentStreak.endDate).diff(dayjs(item.currentStreak.startDate), "day");
-        // Setting the streak to the state
-        setStreak(streakNum); // Setting the streak to the state
+    try {
+      if (!isLoading) {
+        startLoading();
       }
-    });
+      const data = await fetch("/api/streak");
+      const rawData = await data.json();
+
+      rawData.map((item) => {
+        if (item.person == person.toLowerCase()) {
+          // Checking the streak by comparing the end date and start date
+          const streakNum = dayjs(item.currentStreak.endDate).diff(dayjs(item.currentStreak.startDate), "day");
+          // Setting the streak to the state
+          setStreak(streakNum); // Setting the streak to the state
+        }
+      });
+    } catch (err) {
+      console.error("Error fetching data:", err);
+    }
   };
 
   useEffect(() => {
     if (completed) updateStreak().then(() => fetchStreak());
     fetchStreak();
+    stopLoading();
   }, [completed]);
 
   useEffect(() => {
@@ -161,73 +179,79 @@ const MedsTab = ({ person }) => {
 
   return (
     <>
-      <section
-        style={{
-          fontSize: "2rem",
-          lineHeight: "2rem",
-          fontWeight: "bold",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          width: "20rem",
-          marginBottom: "0.5rem",
-          color: color(),
-        }}
-      >
-        <Link href="/">
-          <button>
-            <IoHomeSharp />
-          </button>
-        </Link>
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <>
+          <section
+            style={{
+              fontSize: "2rem",
+              lineHeight: "2rem",
+              fontWeight: "bold",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              width: "20rem",
+              marginBottom: "0.5rem",
+              color: color(),
+            }}
+          >
+            <Link href="/">
+              <button>
+                <IoHomeSharp />
+              </button>
+            </Link>
 
-        <h1
-          style={{
-            padding: "2px 6px",
-            fontSize: "1.35rem",
-            borderRadius: "6px",
-            border: `solid 4px ${color()}`,
-            color: color(),
-          }}
-        >
-          {person}
-        </h1>
-      </section>
+            <h1
+              style={{
+                padding: "2px 6px",
+                fontSize: "1.35rem",
+                borderRadius: "6px",
+                border: `solid 4px ${color()}`,
+                color: color(),
+              }}
+            >
+              {person}
+            </h1>
+          </section>
 
-      {completed && (
-        <section className="flex flex-col justify-center items-center">
-          <Completed />
-          {streak > 0 && (
-            <div className="px-2 py-1">
-              <span style={{ color: color() }} className="text-3xl">
-                &#9734;
-              </span>
+          {completed && (
+            <section className="flex flex-col justify-center items-center">
+              <Completed />
+              {streak > 0 && (
+                <div className="px-2 py-1">
+                  <span style={{ color: color() }} className="text-3xl">
+                    &#9734;
+                  </span>
 
-              <span
-                style={{
-                  fontSize: "1.5rem",
-                  fontWeight: "500",
-                  lineHeight: "1.5rem",
-                  paddingLeft: "4px",
-                  paddingRight: "8px",
-                  color: color(),
-                }}
-              >
-                Streak:
-              </span>
+                  <span
+                    style={{
+                      fontSize: "1.5rem",
+                      fontWeight: "500",
+                      lineHeight: "1.5rem",
+                      paddingLeft: "4px",
+                      paddingRight: "8px",
+                      color: color(),
+                    }}
+                  >
+                    Streak:
+                  </span>
 
-              <span style={{ lineHeight: "1.9rem", fontSize: "1.4rem", fontWeight: "500" }}>{streak}</span>
-            </div>
+                  <span style={{ lineHeight: "1.9rem", fontSize: "1.4rem", fontWeight: "500" }}>{streak}</span>
+                </div>
+              )}
+            </section>
           )}
-        </section>
+
+          <section>
+            <CalendarDate />
+          </section>
+
+          <section>
+            <MedicineTable person={person} completed={completed} setCompleted={setCompleted} />
+          </section>
+        </>
       )}
-
-      <section>
-        <CalendarDate />
-      </section>
-
-      <section>
-        <MedicineTable person={person} completed={completed} setCompleted={setCompleted} />
-      </section>
     </>
   );
 };
