@@ -129,7 +129,7 @@ const MedsTab = ({ person }) => {
     rawData.map((item) => {
       if (item.person == person.toLowerCase()) {
         // Checking the streak by comparing the end date and start date
-        const streakNum = dayjs(item.currentStreak.endDate).diff(dayjs(item.currentStreak.startDate), "day") + 1;
+        const streakNum = dayjs(item.currentStreak.endDate).diff(dayjs(item.currentStreak.startDate), "day");
         // Setting the streak to the state
         setStreak(streakNum); // Setting the streak to the state
       }
