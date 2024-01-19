@@ -124,11 +124,12 @@ const MedsTab = ({ person }) => {
   const fetchStreak = async () => {
     const data = await fetch("/api/streak");
     const rawData = await data.json();
+    console.log(rawData); // Logging the data (for debugging)
 
     rawData.map((item) => {
       if (item.person == person.toLowerCase()) {
         // Checking the streak by comparing the end date and start date
-        const streakNum = dayjs(item.currentStreak.endDate).diff(dayjs(item.currentStreak.startDate), "day");
+        const streakNum = dayjs(item.currentStreak.endDate).diff(dayjs(item.currentStreak.startDate), "day") + 1;
         // Setting the streak to the state
         setStreak(streakNum); // Setting the streak to the state
       }
