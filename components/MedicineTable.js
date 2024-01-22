@@ -7,8 +7,10 @@ import { useLoading } from "@/utils/LoadingContext";
 
 const MedicineRow = ({ medicines, person, meds, setCompleted }) => {
   const { isLoading, startLoading, stopLoading } = useLoading();
-  const dialogRef = useRef(null);
+  const [dialogShow, setDialogShow] = useState(false);
   const newPerson = person.toLowerCase();
+
+  const dialogRef = useRef(null);
 
   const areAllMedsTaken = (updatedMedicines) => {
     return updatedMedicines.every((medicine) => medicine.taken);
@@ -57,11 +59,22 @@ const MedicineRow = ({ medicines, person, meds, setCompleted }) => {
     }
   };
 
-  const toggleDialog = () => {
-    if (!dialogRef.current) {
-      return;
+  const handleOutsideClick = (event) => {
+    if (dialogShow && dialogRef.current && !dialogRef.current.contains(event.target)) {
+      toggleDialog();
     }
-    dialogRef.current.hasAttribute("open") ? dialogRef.current.close() : dialogRef.current.showModal();
+  };
+
+  useEffect(() => {
+    document.addEventListener("click", handleOutsideClick);
+
+    return () => {
+      document.removeEventListener("click", handleOutsideClick);
+    };
+  }, [dialogShow]);
+
+  const toggleDialog = () => {
+    setDialogShow(!dialogShow);
   };
 
   return medicines.map((medicine, index) => (
@@ -85,30 +98,45 @@ const MedicineRow = ({ medicines, person, meds, setCompleted }) => {
             Take
           </button>
         ) : (
-          <button onClick={() => toggleDialog()} className="bg-green-500 font-black text-white px-2 py-1 rounded w-14">
-            &#10003;
-          </button>
-        )}
-
-        <dialog className="p-4 rounded-lg" ref={dialogRef}>
-          <div className="flex flex-col items-center justify-center gap-2 text-center font-semibold">
-            <p className=" text-sm">Are you sure?</p>
-            <div className="flex gap-4">
-              <button
-                onClick={() => handleTakeMedicine(medicine)}
-                className="bg-green-500 font-bold text-white text-xs px-1 py-1 rounded w-14"
+          <div className="relative">
+            <button
+              onClick={() => toggleDialog()}
+              className="bg-green-500 font-black text-white px-2 py-1 rounded w-14"
+            >
+              &#10003;
+            </button>
+            {dialogShow && (
+              <div
+                ref={dialogRef}
+                style={{
+                  position: "absolute",
+                  top: "8px",
+                  right: "-10px",
+                  background: "rgba(17, 24, 39, 0.7)",
+                  backdropFilter: "blur(10px)",
+                  boxShadow: "0 2px 8px rgba(17, 24, 39, 0.4)",
+                }}
+                className="p-4 rounded-lg flex flex-col z-10  items-center justify-center gap-2 text-center font-semibold"
               >
-                Yes
-              </button>
-              <button
-                className=" bg-red-500 font-bold text-xs text-white px-1 py-1 rounded w-14"
-                onClick={() => toggleDialog()}
-              >
-                No
-              </button>
-            </div>
+                <p className=" text-sm">Are you sure?</p>
+                <div className="flex gap-4">
+                  <button
+                    onClick={() => handleTakeMedicine(medicine)}
+                    className="bg-green-500 font-bold text-white text-xs px-1 py-1 rounded w-14"
+                  >
+                    Yes
+                  </button>
+                  <button
+                    className=" bg-red-500 font-bold text-xs text-white px-1 py-1 rounded w-14"
+                    onClick={() => toggleDialog()}
+                  >
+                    No
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
-        </dialog>
+        )}
       </span>
     </span>
   ));
