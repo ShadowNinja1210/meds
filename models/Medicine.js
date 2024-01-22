@@ -15,7 +15,7 @@ const personSchema = new mongoose.Schema({
 });
 
 const finalSchema = new mongoose.Schema({
-  date: Date, //Today and no repetition
+  date: { typeof: Date, unique: true }, //Today and no repetition
   data: [personSchema],
 });
 

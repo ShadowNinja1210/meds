@@ -23,7 +23,7 @@ export default function Home() {
   };
 
   useEffect(() => {
-    createNewMedicine();
+    // createNewMedicine();
   }, []);
 
   return (
