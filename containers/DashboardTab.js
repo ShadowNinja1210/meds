@@ -8,17 +8,20 @@ import Calendar from "@/components/Calendar";
 import Money from "@/components/Money";
 import { useLoading } from "@/utils/LoadingContext";
 import Loader from "@/components/Loader";
+import HistoryTable from "@/components/HistoryTable";
 
 const orbitron = Orbitron({ subsets: ["latin"] });
 
 const DashboardTab = ({ person }) => {
   const [data, setData] = useState({ person: "", data: [], highest: 0, streak: 0 });
   const { startLoading, stopLoading, isLoading } = useLoading();
+  const [streakHistory, setStreakHistory] = useState([]);
 
   const completedData = async () => {
     const res = await fetch("/api/medicines");
     const data = await res.json();
     const dataArr = [];
+
     data.forEach((item) => {
       item.data.forEach((persons) => {
         if (persons.completed) {
@@ -69,6 +72,8 @@ const DashboardTab = ({ person }) => {
       const filteredCompleted = formatData(completedDataResult.filter((item) => item.person === person));
       const filteredStreak = streakHis.filter((item) => item.person === person);
       const streakData = streak.filter((item) => item.person === person);
+
+      setStreakHistory(streakData[0].streakHistory);
 
       const startDate = dayjs(streakData[0].currentStreak.startDate);
       const endDate = dayjs(streakData[0].currentStreak.endDate);
@@ -173,7 +178,21 @@ const DashboardTab = ({ person }) => {
             </div>
           </section>
 
-          <Calendar data={data} />
+          <div>
+            <h1 style={{ fontSize: "1.1rem", fontWeight: "700", marginBottom: "5px", textTransform: "uppercase" }}>
+              <span style={{ fontSize: "1.7rem" }}>S</span>uccessful <span style={{ fontSize: "1.7rem" }}>C</span>
+              alendar
+            </h1>
+            <Calendar data={data} />
+          </div>
+
+          <div>
+            <h1 style={{ fontSize: "1.1rem", fontWeight: "700", marginBottom: "5px", textTransform: "uppercase" }}>
+              <span style={{ fontSize: "1.7rem" }}>S</span>treak <span style={{ fontSize: "1.7rem" }}>H</span>
+              istory
+            </h1>
+            <HistoryTable history={streakHistory} />
+          </div>
         </>
       )}
     </>
