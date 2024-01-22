@@ -2,12 +2,13 @@
 
 import { BsCircleHalf, BsCircleFill } from "react-icons/bs";
 import dayjs from "dayjs";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLoading } from "@/utils/LoadingContext";
 
 const MedicineRow = ({ medicines, person, meds, setCompleted }) => {
-  const newPerson = person.toLowerCase();
   const { isLoading, startLoading, stopLoading } = useLoading();
+  const dialogRef = useRef(null);
+  const newPerson = person.toLowerCase();
 
   const areAllMedsTaken = (updatedMedicines) => {
     return updatedMedicines.every((medicine) => medicine.taken);
@@ -15,6 +16,7 @@ const MedicineRow = ({ medicines, person, meds, setCompleted }) => {
 
   const handleTakeMedicine = async (medicine) => {
     try {
+      toggleDialog();
       if (!isLoading) {
         startLoading();
       }
@@ -55,26 +57,58 @@ const MedicineRow = ({ medicines, person, meds, setCompleted }) => {
     }
   };
 
-  const Tick = () => <span className=" font-black">&#10003;</span>;
+  const toggleDialog = () => {
+    if (!dialogRef.current) {
+      return;
+    }
+    dialogRef.current.hasAttribute("open") ? dialogRef.current.close() : dialogRef.current.showModal();
+  };
 
   return medicines.map((medicine, index) => (
-    <span
-      key={index}
-      className={`flex gap-4 ${medicine.taken ? "opacity-70" : "opacity-100"} ${
-        medicine.postMeal ? "bg-slate-700" : "bg-slate-500"
-      }`}
-    >
-      <span className="py-2 px-4 w-36 flex justify-start items-center">{medicine.name}</span>
-      <span className="py-2 px-4 w-24 flex justify-center items-center">
+    <span key={index} className={`flex gap-4 ${medicine.postMeal ? "bg-slate-700" : "bg-slate-500"}`}>
+      <span
+        className={`${medicine.taken ? "line-through" : "opacity-100"} py-2 px-4 w-36 flex justify-start items-center`}
+      >
+        {medicine.name}
+      </span>
+      <span
+        className={`${medicine.taken ? "opacity-60" : "opacity-100"} py-2 px-4 w-24 flex justify-center items-center`}
+      >
         {medicine.amount == 1 ? <BsCircleFill className="text-white" /> : <BsCircleHalf className="text-white" />}
       </span>
-      <span className="py-2 px-4 w-24 flex justify-start items-center">
-        <button
-          onClick={() => handleTakeMedicine(medicine)}
-          className={`${medicine.taken ? "bg-green-500" : "bg-gray-800"} text-white px-2 py-1 rounded w-14`}
-        >
-          {!medicine.taken ? "Take" : <Tick />}
-        </button>
+      <span className={` py-2 px-4 w-24 flex justify-start items-center`}>
+        {!medicine.taken ? (
+          <button
+            onClick={() => handleTakeMedicine(medicine)}
+            className="bg-gray-800 text-white px-2 py-1 rounded w-14"
+          >
+            Take
+          </button>
+        ) : (
+          <button onClick={() => toggleDialog()} className="bg-green-500 font-black text-white px-2 py-1 rounded w-14">
+            &#10003;
+          </button>
+        )}
+
+        <dialog className="p-4 rounded-lg" ref={dialogRef}>
+          <div className="flex flex-col items-center justify-center gap-2 text-center font-semibold">
+            <p className=" text-sm">Are you sure?</p>
+            <div className="flex gap-4">
+              <button
+                onClick={() => handleTakeMedicine(medicine)}
+                className="bg-green-500 font-bold text-white text-xs px-1 py-1 rounded w-14"
+              >
+                Yes
+              </button>
+              <button
+                className=" bg-red-500 font-bold text-xs text-white px-1 py-1 rounded w-14"
+                onClick={() => toggleDialog()}
+              >
+                No
+              </button>
+            </div>
+          </div>
+        </dialog>
       </span>
     </span>
   ));
