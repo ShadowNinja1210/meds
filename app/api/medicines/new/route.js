@@ -35,7 +35,7 @@ export const POST = async () => {
             { name: "Becosules", amount: 1, time: "Afternoon", taken: false, postMeal: true },
             { name: "Esitamat", amount: 1, time: "Night", taken: false, postMeal: true },
             { name: "Zolmat", amount: 1, time: "Night", taken: false, postMeal: true },
-            { name: "Amipride", amount: 0.5, time: "Night", taken: false, postMeal: true },
+            { name: "Amipride", amount: 1, time: "Night", taken: false, postMeal: true },
           ],
         },
         {
