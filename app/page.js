@@ -4,21 +4,31 @@ import Link from "next/link";
 import { FaChartBar } from "react-icons/fa";
 import { LoadingProvider } from "@/utils/LoadingContext";
 import { useEffect } from "react";
+import dayjs from "dayjs";
 
 export default function Home() {
+  const today = new dayjs();
+
   const createNewMedicine = async () => {
-    const response = await fetch("/api/medicines/new", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+    const medicineRes = await fetch("/api/medicines");
+    const medicine = await medicineRes.json();
+    const isMedicine = await medicine.filter((item) => {
+      return dayjs(item.date).isSame(today, "day");
     });
-    if (response.status === 200) {
-      console.log("Medicine created successfully");
-    } else if (response.status === 418) {
-      console.log("Already exists");
-    } else {
-      console.error("Failed to create medicine", response);
+    console.log(isMedicine.length);
+
+    if (!isMedicine.length) {
+      const response = await fetch("/api/medicines/new", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (response.status === 200) {
+        console.log("Medicine created successfully");
+      } else {
+        console.error("Failed to create medicine", response);
+      }
     }
   };
 

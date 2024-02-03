@@ -32,10 +32,10 @@ export const POST = async () => {
           completed: false,
           medicines: [
             { name: "Esitamat", amount: 0.5, time: "Afternoon", taken: false, postMeal: true },
-            { name: "Feferex-XT", amount: 1, time: "Afternoon", taken: false, postMeal: true },
+            { name: "Becosules", amount: 1, time: "Afternoon", taken: false, postMeal: true },
             { name: "Esitamat", amount: 1, time: "Night", taken: false, postMeal: true },
             { name: "Zolmat", amount: 1, time: "Night", taken: false, postMeal: true },
-            { name: "Ameride", amount: 0.5, time: "Night", taken: false, postMeal: true },
+            { name: "Amipride", amount: 0.5, time: "Night", taken: false, postMeal: true },
           ],
         },
         {
@@ -43,10 +43,12 @@ export const POST = async () => {
           completed: false,
           medicines: [
             { name: "Pentorane", amount: 1, time: "Morning", taken: false, postMeal: false },
-            { name: "Metopole 25XL", amount: 1, time: "Morning", taken: false, postMeal: true },
-            { name: "Dericip Retard", amount: 1, time: "Morning", taken: false, postMeal: true },
+            { name: "Renodax", amount: 1, time: "Morning", taken: false, postMeal: true },
+            { name: "Febukas 40", amount: 1, time: "Morning", taken: false, postMeal: true },
             { name: "Glidax", amount: 1, time: "Afternoon", taken: false, postMeal: false },
-            { name: "Feferex-XT", amount: 1, time: "Afternoon", taken: false, postMeal: true },
+            { name: "Hymet-XL 25", amount: 1, time: "Afternoon", taken: false, postMeal: true },
+            { name: "Dericip Retard", amount: 1, time: "Afternoon", taken: false, postMeal: true },
+            // { name: "Feferex-XT", amount: 1, time: "Afternoon", taken: false, postMeal: true },
           ],
         },
       ],

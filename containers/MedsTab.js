@@ -154,7 +154,11 @@ const MedsTab = ({ person }) => {
   };
 
   useEffect(() => {
-    if (completed) updateStreak().then(() => fetchStreak());
+    if (completed)
+      updateStreak().then(() => {
+        fetchStreak();
+        stopLoading();
+      });
     fetchStreak();
     stopLoading();
   }, [completed]);
@@ -215,6 +219,7 @@ const MedsTab = ({ person }) => {
             </h1>
           </section>
 
+          {/* Congratulations Tab */}
           {completed && (
             <section className="flex flex-col justify-center items-center">
               <Completed />
