@@ -169,12 +169,12 @@ const DashboardTab = ({ person }) => {
           <section className=" rounded-md border-2  bg-gray-900 border-gray-600 py-2 px-4 uppercase flex gap-5 text-xl tracking-wider date-calendar font-semibold">
             <div className="flex flex-col items-center gap-2">
               <p className="text-sm flex flex-col items-center text-gray-300">Current Streak</p>
-              <p className={`${orbitron.className} text-4xl`}>{data.streak}</p>
+              <p className={`${orbitron.className} text-4xl`}>{data.streak + 1}</p>
             </div>
             <hr className=" my-1 border-t-0 border-r-2 h-auto border-gray-600 " />
             <div className="flex flex-col items-center gap-2">
               <p className="text-sm flex flex-col items-center text-gray-300">Highest Streak</p>
-              <p className={`${orbitron.className} text-4xl`}>{data.highest}</p>
+              <p className={`${orbitron.className} text-4xl`}>{data.highest + 1}</p>
             </div>
           </section>
 

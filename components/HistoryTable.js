@@ -12,7 +12,7 @@ const HistoryTable = ({ history }) => {
         <div key={index} className="flex justify-between items-center font-medium">
           <div style={{ width: "100px" }}>{dayjs(item.startDate).format("DD-MM-YYYY")}</div>
           <div style={{ width: "100px" }}>{dayjs(item.endDate).format("DD-MM-YYYY")}</div>
-          <div style={{ width: "60px" }}>{dayjs(item.endDate).diff(dayjs(item.startDate), "day")}</div>
+          <div style={{ width: "60px" }}>{dayjs(item.endDate).diff(dayjs(item.startDate), "day") + 1}</div>
         </div>
       ))}
     </div>
