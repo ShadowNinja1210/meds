@@ -7,8 +7,20 @@ import { useLoading } from "@/utils/LoadingContext";
 
 const MedicineRow = ({ medicines, person, meds, setCompleted }) => {
   const { isLoading, startLoading, stopLoading } = useLoading();
-  const [dialogShow, setDialogShow] = useState(false);
+  const [newMedicines, setNewMedicines] = useState([]);
+
   const newPerson = person.toLowerCase();
+
+  const newMeds = medicines.map((med) => {
+    return {
+      ...med,
+      dialogShow: false,
+    };
+  });
+
+  useEffect(() => {
+    setNewMedicines(newMeds);
+  }, [medicines]);
 
   const dialogRef = useRef(null);
 
@@ -18,7 +30,7 @@ const MedicineRow = ({ medicines, person, meds, setCompleted }) => {
 
   const handleTakeMedicine = async (medicine) => {
     try {
-      toggleDialog();
+      dialogClose(medicine);
       if (!isLoading) {
         startLoading();
       }
@@ -59,25 +71,55 @@ const MedicineRow = ({ medicines, person, meds, setCompleted }) => {
     }
   };
 
-  const handleOutsideClick = (event) => {
-    if (dialogShow && dialogRef.current && !dialogRef.current.contains(event.target)) {
-      toggleDialog();
-    }
-  };
-
   useEffect(() => {
+    const handleOutsideClick = (event) => {
+      // Check if dialog is open and if click occurred outside the dialog
+      const dialogMedicine = newMedicines.find((medicine) => medicine.dialogShow);
+      if (dialogMedicine && dialogRef.current && !dialogRef.current.contains(event.target)) {
+        dialogClose(dialogMedicine);
+      }
+    };
+
     document.addEventListener("click", handleOutsideClick);
 
     return () => {
       document.removeEventListener("click", handleOutsideClick);
     };
-  }, [dialogShow]);
+  }, [newMedicines]);
 
-  const toggleDialog = () => {
-    setDialogShow(!dialogShow);
+  const dialogOpen = (medicine) => {
+    const newMeds = newMedicines.map((med) => {
+      if (med._id === medicine._id) {
+        return {
+          ...med,
+          dialogShow: true,
+        };
+      } else {
+        return {
+          ...med,
+        };
+      }
+    });
+    setNewMedicines(newMeds);
   };
 
-  return medicines.map((medicine, index) => (
+  const dialogClose = (medicine) => {
+    const newMeds = newMedicines.map((med) => {
+      if (med._id === medicine._id) {
+        return {
+          ...med,
+          dialogShow: false,
+        };
+      } else {
+        return {
+          ...med,
+        };
+      }
+    });
+    setNewMedicines(newMeds);
+  };
+
+  return newMedicines.map((medicine, index) => (
     <span key={index} className={`flex gap-4 ${medicine.postMeal ? "bg-slate-700" : "bg-slate-500"}`}>
       <span
         className={`${medicine.taken ? "line-through" : "opacity-100"} py-2 px-4 w-36 flex justify-start items-center`}
@@ -100,12 +142,12 @@ const MedicineRow = ({ medicines, person, meds, setCompleted }) => {
         ) : (
           <div className="relative">
             <button
-              onClick={() => toggleDialog()}
+              onClick={() => dialogOpen(medicine)}
               className="bg-green-500 font-black text-white px-2 py-1 rounded w-14"
             >
               &#10003;
             </button>
-            {dialogShow && (
+            {medicine.dialogShow && (
               <div
                 ref={dialogRef}
                 style={{
@@ -128,7 +170,7 @@ const MedicineRow = ({ medicines, person, meds, setCompleted }) => {
                   </button>
                   <button
                     className=" bg-red-500 font-bold text-xs text-white px-1 py-1 rounded w-14"
-                    onClick={() => toggleDialog()}
+                    onClick={() => dialogClose(medicine)}
                   >
                     No
                   </button>

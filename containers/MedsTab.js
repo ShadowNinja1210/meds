@@ -18,7 +18,6 @@ const MedsTab = ({ person }) => {
   const today = dayjs.utc();
   const yesterday = today.subtract(1, "day");
   const formattedToday = dayjs(today).format("MM-DD-YYYY");
-  const formattedYesterday = dayjs(yesterday).format("MM-DD-YYYY");
 
   const updateStreak = async () => {
     try {
@@ -39,7 +38,7 @@ const MedsTab = ({ person }) => {
             const endDate = dayjs(item.currentStreak.endDate);
 
             // Checking if the person has a streak
-            if (endDate.isSame(dayjs(formattedYesterday))) {
+            if (endDate.isSame(dayjs(yesterday), "day")) {
               // If end date is same as yesterday's date for checking the person has streak or not
               // Updating the Streak Data
               dataToUpdate = {
@@ -48,7 +47,7 @@ const MedsTab = ({ person }) => {
                 endDate: formattedToday,
                 streakHistory: item.streakHistory,
               };
-            } else if (!endDate.isSame(dayjs(formattedToday))) {
+            } else if (!endDate.isSame(dayjs(formattedToday), "day")) {
               // -------
               const startDate = dayjs(item.currentStreak.startDate);
               let canPush;
