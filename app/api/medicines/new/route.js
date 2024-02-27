@@ -9,6 +9,7 @@ export const POST = async () => {
   await connectDB();
   try {
     const today = dayjs.utc();
+    const day = today.day();
     const formattedToday = dayjs(today).format("MM-DD-YYYY").toString();
     const medicines = await Medicine.findOne({ date: formattedToday }); // Getting data from DB
 
@@ -44,7 +45,6 @@ export const POST = async () => {
             { name: "Flexon", amount: 0.5, time: "Night", taken: false, postMeal: true },
             { name: "Ferricor XT", amount: 1, time: "Night", taken: false, postMeal: true },
             { name: "Regestrone", amount: 1, time: "Night", taken: false, postMeal: true },
-            { name: "Uprise D3 60k", amount: 1, time: "Night", taken: false, postMeal: true },
           ],
         },
         {
@@ -62,6 +62,16 @@ export const POST = async () => {
         },
       ],
     };
+
+    if (day === 1) {
+      newData.data[1].medicines.push({
+        name: "Uprise D3 60k",
+        amount: 1,
+        time: "Afternoon",
+        taken: false,
+        postMeal: true,
+      });
+    }
 
     if (!medicines) {
       await Medicine.create(newData);
