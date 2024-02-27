@@ -33,9 +33,18 @@ export const POST = async () => {
           medicines: [
             { name: "Esitamat", amount: 0.5, time: "Afternoon", taken: false, postMeal: true },
             { name: "Becosules", amount: 1, time: "Afternoon", taken: false, postMeal: true },
+            { name: "Flexon", amount: 0.5, time: "Afternoon", taken: false, postMeal: true },
+            { name: "Ferricor XT", amount: 1, time: "Afternoon", taken: false, postMeal: true },
+            { name: "Regestrone", amount: 1, time: "Afternoon", taken: false, postMeal: true },
+            { name: "B29", amount: 1, time: "Afternoon", taken: false, postMeal: true },
+            { name: "Calmax-D", amount: 1, time: "Afternoon", taken: false, postMeal: true },
             { name: "Esitamat", amount: 1, time: "Night", taken: false, postMeal: true },
             { name: "Zolmat", amount: 1, time: "Night", taken: false, postMeal: true },
             { name: "Amipride", amount: 1, time: "Night", taken: false, postMeal: true },
+            { name: "Flexon", amount: 0.5, time: "Night", taken: false, postMeal: true },
+            { name: "Ferricor XT", amount: 1, time: "Night", taken: false, postMeal: true },
+            { name: "Regestrone", amount: 1, time: "Night", taken: false, postMeal: true },
+            { name: "Uprise D3 60k", amount: 1, time: "Night", taken: false, postMeal: true },
           ],
         },
         {
